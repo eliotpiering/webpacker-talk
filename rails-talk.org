@@ -1,0 +1,368 @@
+#+OPTIONS: reveal_title_slide:nil
+#+OPTIONS: toc:nil
+#+OPTIONS: num:nil
+
+#+REVEAL_THEME: serif
+#+REVEAL_TRANS: linear
+#+REVEAL_PLUGINS: (highlight)
+
+* Rails and Javascript (together)
+#+NAME:   fig:holding-hands
+[[./presentations/images/holding-hands.jpg]]
+
+* Overview
+ - Talk generally about Rails. Is it still a good choice?
+ - Talk about Rails' not so secret JS problem
+ - Discuss the new Webpack and Yarn features in Rails 5.1 and what it means
+ - Demo
+
+* Who Am I?
+ - Ruby and Javascript developer
+ - If I could be an Elm developer I would be
+ - LaunchCode alumni and former employee
+ - Currently independent contractor
+  
+* Is Rails a good choice?
+  https://media.giphy.com/media/InEgmsG7PN6M0/giphy.gif
+ - Negative press recently
+ - But yes it is
+
+* Things you may hear about Rails
+ - Point: Slow
+ - Counterpoint: Fast (enough)
+   - Your performance issues are more likely unoptimized code
+
+* More stuff you may hear about Rails
+ - Point: Concurrency is bad, hard to take advantage of multiple cores
+ - Counterpoint: Puma is great. Rails core is now thread safe
+
+* More stuff you may hear about Rails
+ - Point: It doesn't scale
+ - Counterpoint: Ummm... Github
+
+* More stuff you may hear about Rails
+ - Point: Monolithic app structure Bad!
+ - CounterPoint: Monolithic app structure Good!
+# TODO NOTES Sarah Mei (DHH) if your team is less than 15 people monoliths are fine
+
+* Good stuff
+ - Its stable, well supported, great community
+ - Convention over configuration is still a really good idea
+
+* More Good stuff
+ - I know it, well and I can be productive quickly
+https://media.giphy.com/media/mCRJDo24UvJMA/giphy.gif
+
+* But wait... Javascript
+ - Have you tried writing integration tests for a js heavy app
+https://media.giphy.com/media/T8Dhl1KPyzRqU/giphy.gif
+
+* Asset Pipeline
+https://media.giphy.com/media/ReImZejkBnqYU/giphy.gif
+https://media.giphy.com/media/xzW3KvUpP0UiQ/giphy.gif
+https://media.giphy.com/media/amUVFzg1wNZKg/giphy.gif
+
+* Asset Pipeline
+ - Built to put a bunch of .coffee file into a single js file
+ - Nice for managing asset caching
+ - Not really intended for the modern javascript app
+
+* Conclusion
+ - Rails was revolutionary for its time, but has been replaced with better models
+https://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2016/04/1460205265mvc-trex.jpg
+
+* Pre 5.1 feelings
+ - The future of web applications is Javascript
+ - You should write your server in Node (or some other newer framework)
+ 
+* 5.1 - A new hope
+http://ep60qmdjq8-flywheel.netdna-ssl.com/wp-content/uploads/2012/01/tattoine-625x276.jpg
+ - Remove jQuery as default dependency
+ - Manage JavaScript with Yarn. 
+ - Compile JavaScript with Webpack.
+ 
+* The future - Rails and Javascript
+#+NAME:   fig:holding-hands
+[[./presentations/images/holding-hands.jpg]]
+
+Javascript applications and Rails... together
+
+ 
+* Yarn
+ - Still works with npm modules but improves on npm cli tool
+ - yarn.lock similar to Gemfile.lock
+ - faster (runs in paralell)
+ - Mega Secure. (checksums)
+   
+* Webpack
+#+NAME:   fig:holding-hands
+[[./presentations/images/what-is-webpack.png]]
+
+* Another JS build tool?
+ - Grunt and gulp are task runners that can be used to build modules
+ - Browserify is simple but lacks features
+ - Webpack is built to take static files with dependancies and create bundles for the web
+
+* What are some features?
+ - Code spliting, can load relevant javascript asyncrynously on demand. 
+ - Support different built in loaders to preprocess files, i.e. json, jsx, es7, css, less, ... and custom stuff.
+ - Plugins
+ - Dead code pruning
+ - Other awesome stuff
+  
+* Great but..
+Do i have to learn all of this stuff just to use it? 
+https://media.giphy.com/media/fDO2Nk0ImzvvW/giphy.gif
+
+* Webpacker
+ - Rails gem integrates webpack into rails
+ - Hooks into asset pipeline
+ - Uses webpack to bundle js code (and any other assets)
+ - Everything is configured for you!
+   
+* Webpack concepts
+ - Entry Point, Output, Loaders, Plugins
+** Entry Point
+ - Where your source code is
+ - Can be a file or folder
+** Output
+ - A filename to use for the output file(s).
+ - An absolute path to your preferred output directory.
+
+** Output
+With Multiple Entry Points
+#+BEGIN_SRC javascript
+{
+  entry: {
+    app: './src/app.js',
+    search: './src/search.js'
+  },
+
+  output: {
+    filename: '[name].js',
+    path: __dirname + '/dist'
+  }
+}
+#+END_SRC
+     
+** Loaders
+*** 
+ - Loaders are transformations that are applied on the source code of a module. 
+ - They allow you to pre-process files as you import or “load” them. 
+ - Kind of like “tasks” in other build tools.
+
+*** To configure loaders 
+#+BEGIN_SRC javascript
+
+module.exports = {
+  module: {
+    rules: [
+      { test: /\.css$/, use: 'css-loader' },
+      { test: /\.ts$/, use: 'ts-loader' }
+    ]
+  }
+};
+
+#+END_SRC
+
+*** loaders cont.
+ - Loaders can be chained.
+ - Loaders can be synchronous or asynchronous.
+ - Plugins can give loaders more features.
+ - And much more
+   
+** Plugins
+ - Loaders execute transforms on a per-file basis
+ - Plugins can perform actions and custom functionality on "compilations" or "chunks" of your bundled module
+ - Plugins have access to full pipeline of the build
+
+** Sample Plugins
+ - BabelMinifyWebpackPlugin -  Minification with babel-minify 
+ - AggressiveSplittingPlugin -  Splits the original chunks into smaller chunks
+ - ExtractTextWebpackPlugin  - Extract text (CSS) from your bundles into a separate file
+ - HotModuleReplacementPlugin  - Enable HMR
+
+# * demo
+
+# ** demo
+#    rails new --database=sqlite3 --skip-coffee --webpack=react WebpackerDemo
+#    add gem 'webpacker', '~> 2.0'
+#    bundle install
+#    rails webpacker
+#    rails webpacker:install
+
+# *** stop to talk
+
+# Break down the files generated
+
+#  .babelrc
+#  .postcssrc.yml
+#  app/javascript/packs/application.js
+#  bin/webpack
+#  bin/webpack-dev-server
+#  config/webpack/configuration.js
+#  config/webpack/development.js
+#  config/webpack/loaders/assets.js
+#  config/webpack/loaders/babel.js
+#  config/webpack/loaders/coffee.js
+#  config/webpack/loaders/erb.js
+#  config/webpack/loaders/sass.js
+#  config/webpack/production.js
+#  config/webpack/shared.js
+#  config/webpack/test.js
+#  config/webpacker.yml
+#  yarn.lock
+
+# config files:  .babelrc | postcssrc.yml
+
+# ------------------------------------------------------------
+
+# our first pack: app/javascript/packs/application.js
+
+# ------------------------------------------------------------
+
+# webpack bins: 
+#   bin/webpack  == loads config files and set env then 
+#     yarn run webpack -- --config config/webpack/development.js
+#   bin/webpack-dev-server
+
+#         same thing except also running live reload server
+
+#         loads config/webpack/[environment].js
+#               which merges main config file -- config/webpack/configuration.js and shared.js
+
+        
+#               shared has anything shared and configuration just main path information and what server actually
+#               Question why have both shared.js and configuration.js
+
+# ------------------------------------------------------------
+
+#         development.js
+#           has a dev server
+#         production.js
+#           minimize and compress 
+#         test.js
+#           nothing really
+
+# ------------------------------------------------------------
+
+
+
+# loads rails config -> config/webpack.yml
+#   source_path: app/javascript
+#   source_entry_path: packs
+#   public_output_path: packs
+
+#   extensions: i.e .coffee. .erb, .js, .jsx, .ts, .vue, .sass, .scss, .css, .png, .svg, .gif, .jpeg, .jpg
+
+# loads 'loaders'
+# sets public path
+
+# and then ...
+# const output = {
+#   path: resolve('public', settings.public_output_path),
+#   publicPath: formatPublicPath(env.ASSET_HOST, settings.public_output_path)
+# }
+
+# module.exports = {
+#   settings,
+#   env,
+#   loadersDir,
+#   output
+# }
+
+
+
+# ------------------------------------------------------------
+
+# rails webpack: 
+
+# ------------------------------------------------------------
+
+# webpack config: 
+
+# loaders: loaders/assets.js
+#          loaders/babel.js
+#          loaders/coffee.js
+#          loaders/erb.js
+#          loaders/sass.js
+
+
+#  yarn.lock
+
+# *** install react
+#     rails webpacker:install:react
+# *** stop to talk
+#     new files:
+# .babelrc
+# app/javascript/packs/hello_react.jsx
+# config/webpack/loaders/react.js
+# package.json
+# yarn.lock
+
+# *** install elm
+#     rails webpacker:install:elm
+                 
+
+
+# *** Start to use webpacker 
+# rails generate resource JSApp 
+# rails db:migrate
+
+# ** comits 
+# *** rails new
+# Whole bunch of stuff
+# *** webpacker install 
+# create mode 100644  .babelrc
+#  create mode 100644 .postcssrc.yml
+#  create mode 100644 app/javascript/packs/application.js
+#  create mode 100755 bin/webpack
+#  create mode 100755 bin/webpack-dev-server
+#  create mode 100644 config/webpack/configuration.js
+#  create mode 100644 config/webpack/development.js
+#  create mode 100644 config/webpack/loaders/assets.js
+#  create mode 100644 config/webpack/loaders/babel.js
+#  create mode 100644 config/webpack/loaders/coffee.js
+#  create mode 100644 config/webpack/loaders/erb.js
+#  create mode 100644 config/webpack/loaders/sass.js
+#  create mode 100644 config/webpack/production.js
+#  create mode 100644 config/webpack/shared.js
+#  create mode 100644 config/webpack/test.js
+#  create mode 100644 config/webpacker.yml
+#  create mode 100644 yarn.lock
+
+# *** webpacker intall:react
+# *** using the first pack
+# 	modified:   app/controllers/application_controller.rb
+# 	new file:   app/views/application/index.html.erb
+# 	modified:   config/routes.r
+
+# .babelrc
+# app/javascript/packs/hello_react.jsx
+# config/webpack/loaders/react.js
+# package.json
+# yarn.lock
+
+# *** webpacker install:elm
+# 	modified:   .gitignore
+# 	new file:   app/javascript/packs/Main.elm
+# 	new file:   app/javascript/packs/hello_elm.js
+# 	new file:   config/webpack/loaders/elm.js
+# 	modified:   config/webpacker.yml
+# 	new file:   elm-package.json
+# 	modified:   package.json
+# 	modified:   yarn.lock
+
+* Demo
+
+* Questions?
+
+* resources
+** http://weblog.rubyonrails.org/2016/6/30/Rails-5-0-final/
+** http://weblog.rubyonrails.org/2017/4/27/Rails-5-1-final/
+** https://yarnpkg.com/en/
+** https://www.sitepoint.com/yarn-vs-npm/
+** https://webpack.js.org/concepts/
+** https://stackoverflow.com/questions/35062852/npm-vs-bower-vs-browserify-vs-gulp-vs-grunt-vs-webpack
+** http://www.akitaonrails.com/2017/08/03/why-is-it-just-lazy-to-bad-mouth-ruby-on-rails
+
